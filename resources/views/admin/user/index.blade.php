@@ -27,15 +27,15 @@
                      <td>
                          @if($user->photo_id == null)
 
-                             <img height="30"  width="30" src="{{asset('images/image-placeholder.jpeg')}}" alt="User Image">
+                             <img height="30"  width="30" src="{{asset('images/image-placeholder.jpeg')}}" alt="User Image" class="img-circle">
 
                          @else
 
-                             <img height="30"  width="30" src="{{asset('images/'.$user->photo->name)}}" alt="User Image">
+                             <img height="30"  width="30" src="{{$user->photo->name}}" alt="User Image" class="img-circle">
 
                          @endif
                      </td>
-                     <td>{{$user->name}}</td>
+                     <td><a href="{{route('user.edit',$user->id)}}">{{$user->name}}</a></td>
                      <td>{{$user->email}}</td>
                      <td class="text-capitalize">{{$user->role->name}}</td>
                      <td>{{$user->is_active == 1 ? 'Active' : 'Not Active'}}</td>
