@@ -8,6 +8,7 @@ use App\Photo;
 use App\Role;
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\Session;
 
 class AdminUserController extends Controller
 {
@@ -126,17 +127,32 @@ class AdminUserController extends Controller
 
         $user->update($input);
 
+        Session::flash('user_update','User updated Successfully');
+
         return redirect('/admin/user');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy($id)
     {
-        //
+        $user = User::FindOrFail($id);
+
+        $photo = Photo::FindOrFail($user->photo_id);
+
+        unlink(public_path($user->photo->name)); //deleting file from server too
+
+        $photo->delete();
+
+        $user->delete();
+
+        Session::flash('deleted_user','The User has been deleted Successfully');
+
+        return redirect('admin/user');
     }
 }

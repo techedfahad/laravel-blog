@@ -12,7 +12,7 @@ class Photo extends Model
 
     protected $dir = "/images/";
 
-    public function getNameAttribute($photo) {
+    public function getNameAttribute($photo) {   //Using Accessor to get photo name
         return $this->dir.$photo;
     }
 }

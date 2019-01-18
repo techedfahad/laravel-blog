@@ -2,8 +2,23 @@
 @section('title')
     Users
 @stop
+
 @section('content')
+
+
     <h1>Users</h1>
+
+    @if(session()->has('deleted_user'))
+        <div class="m-t-5 alert alert-danger">
+            <p>{{session('deleted_user')}}</p>
+        </div>
+    @endif
+
+    @if(session()->has('user_update'))
+        <div class="m-t-5 alert alert-success">
+            <p>{{session('user_update')}}</p>
+        </div>
+    @endif
 
      <table class="table">
          <thead>
@@ -16,6 +31,7 @@
                <th>Status</th>
                <th>Created</th>
                <th>Updated</th>
+               <th>Action</th>
            </tr>
          </thead>
          <tbody>
@@ -41,6 +57,38 @@
                      <td>{{$user->is_active == 1 ? 'Active' : 'Not Active'}}</td>
                      <td>{{$user->created_at->diffForHumans()}}</td>
                      <td>{{$user->updated_at->diffForHumans()}}</td>
+                     <td>
+                         <button class="btn btn-danger" data-toggle="modal" data-target="#delete-modal-{{$user->id}}" data-id="{{$user->id}}"> &times; </button>
+                     </td>
+
+                     <!-- Modal -->
+                     <div class="modal fade" id="delete-modal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="deleteUser" aria-hidden="true">
+                         <div class="modal-dialog" role="document">
+                             <div class="modal-content">
+                                 <div class="modal-header">
+                                     <h5 class="modal-title" id="deleteUserLabel"><b>Confirm Deleting User</b></h5>
+                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                         <span aria-hidden="true">&times;</span>
+                                     </button>
+                                 </div>
+                                 <div class="modal-body">
+                                     <p> Do you really want to <strong> delete </strong> user <strong>{{$user->name}}</strong>?</p>
+                                 </div>
+                                 <div class="modal-footer">
+
+
+                                     {!! Form::open(['method'=>'DELETE','action'=>['AdminUserController@destroy', $user->id]]) !!}
+
+                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                         <button type="submit" class="btn btn-danger">Yes</button>
+
+                                     {!! Form::close() !!}
+
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+
                  </tr>
              @endforeach
          @endif
@@ -49,3 +97,4 @@
        </table>
 
 @endsection
+
