@@ -102,8 +102,6 @@ class AdminUserController extends Controller
     {
         $user = User::FindOrFail($id);
 
-        $input = $request->all();
-
         if ($request->password == '') {
 
             $input = $request->except('password');
@@ -143,11 +141,14 @@ class AdminUserController extends Controller
     {
         $user = User::FindOrFail($id);
 
-        $photo = Photo::FindOrFail($user->photo_id);
+        if($user->photo) {
+            $photo = Photo::FindOrFail($user->photo_id);
 
-        unlink(public_path($user->photo->name)); //deleting file from server too
+            unlink(public_path($user->photo->name)); //deleting file from server too
 
-        $photo->delete();
+            $photo->delete();
+
+        }
 
         $user->delete();
 

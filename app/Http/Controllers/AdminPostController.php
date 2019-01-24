@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\PostUpdateRequest;
 use App\Photo;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AdminPostController extends Controller
 {
@@ -79,7 +81,9 @@ class AdminPostController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = Category::pluck('name','id')->all();
+        $post = Post::FindOrFail($id);
+        return view('admin.post.edit',compact('category','post'));
     }
 
     /**
@@ -89,9 +93,26 @@ class AdminPostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PostUpdateRequest $request, $id)
     {
-        //
+        $input = $request->all();
+
+        if ($file = $request->file('photo_id')) {
+
+            $name = time() . $file->getClientOriginalName();
+
+            $photo = Photo::create(['name' =>$name]);
+
+            $file->move('images', $name);
+
+            $input['photo_id'] = $photo->id;
+        }
+
+        Auth::user()->posts()->whereId($id)->first()->update($input);
+
+        Session::flash('post_updated','Post Updated Successfully.');
+
+        return redirect('admin/post');
     }
 
     /**
@@ -102,6 +123,18 @@ class AdminPostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::FindOrFail($id);
+
+        $photo = Photo::FindOrFail($post->photo->id);
+
+        unlink(public_path($photo->name));
+
+        $post->delete();
+
+        $photo->delete();
+
+        Session::flash('deleted_user','The User has been deleted Successfully');
+
+        return redirect('admin/post');
     }
 }
